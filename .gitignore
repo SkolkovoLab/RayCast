@@ -1,0 +1,7 @@
+target/
+.idea/
+*.impl
+
+dependency-reduced-pom.xml
+*.rar
+*.zip
