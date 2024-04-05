@@ -18,7 +18,7 @@ public class Benchmark {
     private static final Vec dir = new Vec(1, 0, 3).normalize();
 
     /**
-     * block 256 100 hitbox 100 256 512 20 10 5000 10 all 100 256 512 20 10 5000 10
+     * block 100 256 hitbox 100 256 512 20 10 5000 10 all 100 256 512 20 10 5000 10
      * */
     public static void main(String[] args) {
         int i = 0;
@@ -61,8 +61,8 @@ public class Benchmark {
             RayCastTool.rayCast(blockProducer, null, pose, dir, distance, request);
         }
         System.out.println("Hitbox for\t" +
-                           "\tdistance " + distance +
-                           "\titerations " + count
+                           "\titerations " + count +
+                           "\tdistance " + distance
         );
         request.printResult();
         request.clear();
@@ -115,8 +115,9 @@ public class Benchmark {
             RayCastTool.rayCast(null, hitBoxGroups, pose, dir, distance, request);
         }
         System.out.println("Hitbox for\t" +
-                           "\tdistance " + distance +
                            "\titerations " + count +
+                           "\tdistance " + distance +
+                           "\thitBoxDistance " + hitBoxDistance +
                            "\tactiveCount " + activeCount +
                            "\tactiveSize " + activeSize +
                            "\tinactiveCount " + inactiveCount +
@@ -173,9 +174,10 @@ public class Benchmark {
             request.start();
             RayCastTool.rayCast(blockProducer, hitBoxGroups, pose, dir, distance, request);
         }
-        System.out.println("Hitbox for\t" +
-                           "\tdistance " + distance +
+        System.out.println("All for\t" +
                            "\titerations " + count +
+                           "\tdistance " + distance +
+                           "\thitBoxDistance " + hitBoxDistance +
                            "\tactiveCount " + activeCount +
                            "\tactiveSize " + activeSize +
                            "\tinactiveCount " + inactiveCount +
