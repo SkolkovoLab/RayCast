@@ -23,12 +23,11 @@ public class RayCastHitBox<T extends HitBox> implements Iterable<HitBoxCollision
     public static <T extends HitBox> RayCastHitBox<T> createRaycast(Collection<HitBoxGroup<T>> hitboxes, Vector3D pos, Vector3D dir) {
         dir = dir.normalize();
         Vector3D finalDir = dir;
-        List<RayCastHitBoxGroup<T>> groups = hitboxes.stream()
-                .map(h -> RayCastHitBoxGroup.createGroup(h, pos, finalDir))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .sorted()
-                .toList();
+        List<RayCastHitBoxGroup<T>> groups = new ArrayList<>();
+        for (HitBoxGroup<T> g : hitboxes) {
+            RayCastHitBoxGroup.createGroup(g, pos, finalDir).ifPresent(groups::add);
+        }
+        groups.sort(RayCastHitBoxGroup::compareTo);
         return new RayCastHitBox<>(groups);
     }
 
