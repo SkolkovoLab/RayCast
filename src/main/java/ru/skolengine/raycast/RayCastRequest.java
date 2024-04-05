@@ -29,7 +29,9 @@ public interface RayCastRequest<H extends HitBox> {
      * @param block The block that was hit.
      * @return Whether the raycast should finish.
      */
-    boolean onBlockOut(@NotNull VecRel in, @NotNull VecRel out, Block block);
+    default boolean onBlockOut(@NotNull VecRel in, @NotNull VecRel out, Block block) {
+        return false;
+    }
 
     /**
      * Called when the raycast cross an air block
@@ -62,7 +64,9 @@ public interface RayCastRequest<H extends HitBox> {
      * @param box The hitbox that was hit.
      * @return Whether the raycast should finish.
      */
-    boolean onHitBoxOut(@NotNull VecRel in, @NotNull VecRel out, HitBoxGroup<H> parent, H box);
+    default boolean onHitBoxOut(@NotNull VecRel in, @NotNull VecRel out, HitBoxGroup<H> parent, H box) {
+        return false;
+    }
 
     /**
      * Called when the raycast finishes.
