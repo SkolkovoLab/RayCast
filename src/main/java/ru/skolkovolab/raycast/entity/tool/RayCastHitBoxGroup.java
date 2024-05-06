@@ -60,20 +60,18 @@ public class RayCastHitBoxGroup<T extends HitBox> implements Iterable<HitBoxColl
      **/
     public static <T extends HitBox> Optional<RayCastHitBoxGroup<T>> createGroup(HitBoxGroup<T> group, Vector3D pos, Vector3D dir) {
         dir = dir.normalize();
-        Vector3D center = group.getHitBoxGroupCenter();
-        double dX = pos.getX() - center.getX();
-        double dY = pos.getY() - center.getY();
-        double dZ = pos.getZ() - center.getZ();
-        double r = group.getHitBoxGroupRadius();
-        double c = (dX * dX + dY * dY + dZ * dZ - r * r);
+        double dX = pos.getX() - group.getHitBoxGroupCenter().getX();
+        double dY = pos.getY() - group.getHitBoxGroupCenter().getY();
+        double dZ = pos.getZ() - group.getHitBoxGroupCenter().getZ();
+        double c = (dX * dX + dY * dY + dZ * dZ - group.getHitBoxGroupRadius() * group.getHitBoxGroupRadius());
         double halfB = (dX * dir.getX() + dY * dir.getY() + dZ * dir.getZ());
         double D = halfB * halfB - c;
         if (D < 0) {
             return Optional.empty();
         } else {
-            if (Math.abs(D) < halfB*halfB)
-                return Optional.empty();
             double DSqrt = Math.sqrt(D);
+            if (DSqrt < halfB)
+                return Optional.empty();
             return Optional.of(new RayCastHitBoxGroup<>(group, -halfB - DSqrt, -halfB + DSqrt, pos, dir));
         }
     }
