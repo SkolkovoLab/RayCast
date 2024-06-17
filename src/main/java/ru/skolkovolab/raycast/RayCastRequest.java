@@ -1,5 +1,6 @@
 package ru.skolkovolab.raycast;
 
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 import ru.skolkovolab.raycast.entity.HitBox;
@@ -34,12 +35,11 @@ public interface RayCastRequest<H extends HitBox> {
     /**
      * Called when the raycast cross an air block
      *
-     * @param in    The position of the raycast when it hits the block on join.
-     * @param out   The position of the raycast when it hits the block on leave.
+     * @param blockPos The position of the block that was hit.
      * @param block The block that was hit.
      * @return Whether the raycast should finish.
      */
-    default boolean onBlockAirCross(@NotNull VecRel in, @NotNull VecRel out, Block block) {
+    default boolean onBlockStep(Vec blockPos, Block block) {
         return false;
     }
 
@@ -75,7 +75,7 @@ public interface RayCastRequest<H extends HitBox> {
     enum FinishReason {
         BLOCK_IN,
         BLOCK_OUT,
-        AIR_CROSS,
+        BLOCK_STEP,
         HITBOX_IN,
         HITBOX_OUT,
         MAX_DISTANCE

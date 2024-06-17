@@ -155,9 +155,9 @@ public class RayCastTool {
     private static <T extends HitBox> boolean applyCollision(RayCastCollision<?> collision,
                                                             RayCastRequest<T> request) {
         if (collision instanceof BlockCollision blockCollision) {
-            if (blockCollision.target().isAir()) {
-                if (request.onBlockAirCross(blockCollision.in(), blockCollision.out(), blockCollision.target())) {
-                    request.onRayCastFinish(RayCastRequest.FinishReason.AIR_CROSS);
+            if (blockCollision.isStep()) {
+                if (request.onBlockStep(blockCollision.blockPos(), blockCollision.target())) {
+                    request.onRayCastFinish(RayCastRequest.FinishReason.BLOCK_STEP);
                     return true;
                 }
             } else {

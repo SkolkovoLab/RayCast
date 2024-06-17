@@ -144,6 +144,7 @@ public class RayCastBlock implements Iterable<BlockCollision> {
                         half = true;
                         pair = new VecRel(this.origin[0], 0);
                     }
+                    this.deque.add(RayCastBlockUtils.buildBlockStep(this.getter, pair, this.prev));
                     this.deque.addAll(RayCastBlockUtils.buildBlockCollisions(this.getter, this.direction,
                             pair, this.prev, half));
                 }

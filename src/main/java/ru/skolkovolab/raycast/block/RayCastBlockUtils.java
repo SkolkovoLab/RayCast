@@ -17,6 +17,7 @@ import java.util.stream.Stream;
  * @author danirod12 - NTD STUDIOS
  */
 public class RayCastBlockUtils {
+
     private static final Field COLLISION_SHAPE_FIELD;
 
     static {
@@ -86,8 +87,12 @@ public class RayCastBlockUtils {
         };
     }
 
-    public static Vec mid(Point vec1, Point vec2) {
-        return new Vec((vec1.x() + vec2.x()) / 2, (vec1.y() + vec2.y()) / 2, (vec1.z() + vec2.z()) / 2);
+    public static Vec midBlockPos(Point vec1, Point vec2) {
+        return new Vec(
+                Math.floor((vec1.x() + vec2.x()) / 2),
+                Math.floor((vec1.y() + vec2.y()) / 2),
+                Math.floor((vec1.z() + vec2.z()) / 2)
+        );
     }
 
     public static <T> void swap(T[] arr, int i, int j) {
@@ -105,13 +110,28 @@ public class RayCastBlockUtils {
         }
     }
 
-    public static List<BlockCollision> buildBlockCollisions(Block.Getter getter, Vec[] dir,
-                                                            VecRel vec1, VecRel vec2, boolean half) {
-        Vec mid = mid(vec1.vec(), vec2.vec());
+    public static BlockCollision buildBlockStep(
+            Block.Getter getter,
+            VecRel vec1,
+            VecRel vec2
+    ) {
+        Vec mid = midBlockPos(vec1.vec(), vec2.vec());
+        Block block = getter.getBlock(mid);
+        return new Collision(vec1, vec2, mid, block, false, true);
+    }
+
+    public static List<BlockCollision> buildBlockCollisions(
+            Block.Getter getter,
+            Vec[] dir,
+            VecRel vec1,
+            VecRel vec2,
+            boolean half
+    ) {
+        Vec mid = midBlockPos(vec1.vec(), vec2.vec());
         Block block = getter.getBlock(mid);
 
         if (block.isAir()) {
-            return Collections.singletonList(new Collision(vec1, vec2, block, false));
+            return Collections.emptyList();
         }
 
         Vec loc = new Vec(mid.blockX(), mid.blockY(), mid.blockZ());
@@ -130,10 +150,11 @@ public class RayCastBlockUtils {
                 })
                 .filter(pair -> !half || (pair.a.b >= 0 && /* assertion */ pair.b.b >= 0))
                 .flatMap(pair -> Stream.of(
-                        (BlockCollision) new Collision(pair.a, pair.b, block, true),
-                        new Collision(pair.a, pair.b, block, false)
+                        (BlockCollision) new Collision(pair.a, pair.b, mid, block, true, false),
+                        new Collision(pair.a, pair.b, mid, block, false, false)
                 ))
                 .sorted(Comparator.comparingDouble(c -> (c.distance() * 2) + (c.isOutlet() ? 1 : 0)))
                 .toList();
     }
+
 }
