@@ -9,33 +9,16 @@ import ru.skolkovolab.raycast.shared.Pair;
 import ru.skolkovolab.raycast.shared.VecRel;
 import ru.skolkovolab.raycast.shared.collision.BlockCollision;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
  * @author danirod12 - NTD STUDIOS
  */
 public class RayCastBlockUtils {
-
-    private static final Field COLLISION_SHAPE_FIELD;
-
-    static {
-        try {
-            COLLISION_SHAPE_FIELD = ShapeImpl.class.getDeclaredField("collisionBoundingBoxes");
-            COLLISION_SHAPE_FIELD.setAccessible(true);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    public static BoundingBox[] getShape(Block block) {
-        try {
-            return (BoundingBox[]) RayCastBlockUtils.COLLISION_SHAPE_FIELD.get(block.registry().collisionShape());
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
-    }
 
     public static Pair<VecRel, VecRel> getIntersection(Point boxStart, Point boxEnd, Point[] from, Point[] dir) {
         double[] boxRaw = new double[]{boxStart.x(), boxStart.y(), boxStart.z(), boxEnd.x(), boxEnd.y(), boxEnd.z()};
@@ -141,7 +124,10 @@ public class RayCastBlockUtils {
                 rotate(vec1.vec(), 2)
         };
 
-        return Arrays.stream(getShape(block))
+        @SuppressWarnings("UnstableApiUsage")
+        List<BoundingBox> boundingBoxes = ((ShapeImpl) block.registry().collisionShape()).collisionBoundingBoxes();
+
+        return boundingBoxes.stream()
                 .map(shape -> getIntersection(shape.relativeStart().add(loc), shape.relativeEnd().add(loc), from, dir))
                 .filter(Objects::nonNull)
                 .peek(pair -> {

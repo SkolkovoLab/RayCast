@@ -19,7 +19,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
-import net.minestom.server.particle.data.DustParticleData;
 import net.minestom.server.world.DimensionType;
 import org.apache.commons.geometry.euclidean.threed.rotation.QuaternionRotation;
 import org.apache.commons.numbers.quaternion.Quaternion;
@@ -42,7 +41,6 @@ public class RayCast {
 
         InstanceContainer world = MinecraftServer.getInstanceManager()
                 .createInstanceContainer(DimensionType.OVERWORLD);
-        MinecraftServer.getBiomeManager().loadVanillaBiomes();
         world.setChunkSupplier(LightingChunk::new);
         for (int x = -10; x <= 10; x++) {
             for (int z = -10; z <= 10; z++) {
@@ -152,11 +150,13 @@ public class RayCast {
                 for (Player player : world.getPlayers()) {
                     for (Color color : vec.getValue()) {
                         player.sendPacket(new ParticlePacket(
-                                Particle.DUST.id(), false,
-                                vec.getKey().x(), vec.getKey().y(), vec.getKey().z(),
-                                0, 0, 0, 0, 1,
-                                new DustParticleData(color, 0.5F))
-                        );
+                                Particle.DUST.withProperties(color, 0.5f),
+                                false,
+                                vec.getKey(),
+                                Vec.ZERO,
+                                0,
+                                1
+                        ));
                     }
                 }
             }

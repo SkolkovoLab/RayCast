@@ -28,7 +28,7 @@ public class HitBoxTest extends Entity implements HitBox {
         } else if (type.equals(EntityType.BLOCK_DISPLAY)) {
             this.type = HitBoxType.BLOCK_DISPLAY;
             BlockDisplayMeta m = (BlockDisplayMeta) super.getEntityMeta();
-            m.setBlockState(Block.DIRT.stateId());
+            m.setBlockState(Block.DIRT);
         } else {
             throw new IllegalArgumentException();
         }
