@@ -70,6 +70,8 @@ public class RayCastTool {
                                                      @Nullable Collection<HitBoxGroup<T>> hitBoxGroups,
                                                      Vec originBase, Vec originDirection, double maxDistance,
                                                      RayCastRequest<T> request) {
+        if (isNaN(originBase)) throw new IllegalArgumentException("Origin base is NaN");
+        if (isNaN(originDirection)) throw new IllegalArgumentException("Origin direction is NaN");
         if (instance == null && hitBoxGroups == null) {
             throw new IllegalArgumentException("You should provide at least one of instance (world) and hitbox entities");
         }
@@ -88,6 +90,14 @@ public class RayCastTool {
             return rayCast((Iterator) rchb.iterator(), maxDistance, request);
         }
         return RayCastTool.rayCast(rcb, rchb, maxDistance, request);
+    }
+
+    public static boolean isNaN(Vec vec) {
+        var x = Double.isNaN(vec.x()) || Double.isInfinite(vec.x());
+        var y = Double.isNaN(vec.y()) || Double.isInfinite(vec.y());
+        var z = Double.isNaN(vec.z()) || Double.isInfinite(vec.z());
+
+        return x || y || z;
     }
 
     /**
