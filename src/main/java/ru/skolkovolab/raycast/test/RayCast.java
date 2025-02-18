@@ -152,6 +152,7 @@ public class RayCast {
                         player.sendPacket(new ParticlePacket(
                                 Particle.DUST.withProperties(color, 0.5f),
                                 false,
+                                true,
                                 vec.getKey(),
                                 Vec.ZERO,
                                 0,
