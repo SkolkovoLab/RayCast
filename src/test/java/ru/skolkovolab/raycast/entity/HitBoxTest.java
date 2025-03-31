@@ -1,4 +1,4 @@
-package ru.skolkovolab.raycast.test.entity;
+package ru.skolkovolab.raycast.entity;
 
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -11,7 +11,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.apache.commons.geometry.euclidean.threed.rotation.QuaternionRotation;
 import org.jetbrains.annotations.NotNull;
-import ru.skolkovolab.raycast.entity.HitBox;
 
 /**
  * @author sidey383

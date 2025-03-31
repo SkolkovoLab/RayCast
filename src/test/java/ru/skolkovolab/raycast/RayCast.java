@@ -1,4 +1,4 @@
-package ru.skolkovolab.raycast.test;
+package ru.skolkovolab.raycast;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -23,18 +23,20 @@ import net.minestom.server.world.DimensionType;
 import org.apache.commons.geometry.euclidean.threed.rotation.QuaternionRotation;
 import org.apache.commons.numbers.quaternion.Quaternion;
 import org.jetbrains.annotations.NotNull;
-import ru.skolkovolab.raycast.RayCastRequest;
-import ru.skolkovolab.raycast.RayCastTool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.skolkovolab.raycast.entity.HitBox;
 import ru.skolkovolab.raycast.entity.HitBoxGroup;
 import ru.skolkovolab.raycast.shared.VecRel;
-import ru.skolkovolab.raycast.test.entity.HitBoxTest;
+import ru.skolkovolab.raycast.entity.HitBoxTest;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RayCast {
+
+    private static final Logger log = LoggerFactory.getLogger(RayCast.class);
 
     public static void main(String[] args) {
         MinecraftServer server = MinecraftServer.init();
@@ -92,10 +94,18 @@ public class RayCast {
                                 }
 
                                 @Override
-                                public boolean onBlockOut(@NotNull VecRel in, @NotNull VecRel out, Block block) {
+                                public boolean onBlockOut(
+                                        @NotNull VecRel in, @NotNull Vec inNormal,
+                                        @NotNull VecRel out, @NotNull Vec outNormal,
+                                        Block block
+                                ) {
                                     map.computeIfAbsent(in.vec(), vec -> new ArrayList<>())
                                             .add(new Color(255, 0, 0));
                                     map.computeIfAbsent(out.vec(), vec -> new ArrayList<>())
+                                            .add(new Color(0, 255, 0));
+                                    map.computeIfAbsent(in.vec().add(inNormal.mul(0.1)), vec -> new ArrayList<>())
+                                            .add(new Color(255, 0, 0));
+                                    map.computeIfAbsent(out.vec().add(outNormal.mul(0.1)), vec -> new ArrayList<>())
                                             .add(new Color(0, 255, 0));
                                     return false;
                                 }
@@ -108,7 +118,7 @@ public class RayCast {
                                 }
                             });
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    log.warn("RayCast exception", exception);
                 }
 //                player.sendMessage("Ray cast from: " + player.getPosition().asVec());
                 player.sendMessage("Wrote " + map.size()
