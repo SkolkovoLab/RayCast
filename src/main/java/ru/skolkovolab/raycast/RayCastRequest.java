@@ -15,10 +15,17 @@ public interface RayCastRequest<H extends HitBox> {
      * Called when the raycast hits a block (join).
      *
      * @param in    The position of the raycast when it hits the block on join.
+     * @param inNormal    The normal of the raycast when it hits the block on join.
+     * @param out   The position of the raycast when it hits the block on leave.
+     * @param outNormal   The normal of the raycast when it hits the block on leave.
      * @param block The block that was hit.
      * @return Whether the raycast should finish.
      */
-    default boolean onBlockIn(@NotNull VecRel in, @NotNull VecRel out, Block block) {
+    default boolean onBlockIn(
+            @NotNull VecRel in, @NotNull Vec inNormal,
+            @NotNull VecRel out, @NotNull Vec outNormal,
+            Block block
+    ) {
         return false;
     }
 
@@ -26,11 +33,16 @@ public interface RayCastRequest<H extends HitBox> {
      * Called when the raycast hits a block (leave).
      *
      * @param in    The position of the raycast when it hits the block on join.
+     * @param inNormal    The normal of the raycast when it hits the block on join.
      * @param out   The position of the raycast when it hits the block on leave.
+     * @param outNormal   The normal of the raycast when it hits the block on leave.
      * @param block The block that was hit.
      * @return Whether the raycast should finish.
      */
-    boolean onBlockOut(@NotNull VecRel in, @NotNull VecRel out, Block block);
+    boolean onBlockOut(
+            @NotNull VecRel in, @NotNull Vec inNormal,
+            @NotNull VecRel out, @NotNull Vec outNormal,
+            Block block);
 
     /**
      * Called when the raycast cross an air block

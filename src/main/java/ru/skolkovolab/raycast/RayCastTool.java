@@ -172,12 +172,22 @@ public class RayCastTool {
                 }
             } else {
                 if (blockCollision.isInlet()) {
-                    if (request.onBlockIn(blockCollision.in(), blockCollision.out(), blockCollision.target())) {
+                    if (
+                            request.onBlockIn(
+                                    blockCollision.in(), blockCollision.inNormal(),
+                                    blockCollision.out(), blockCollision.outNormal(),
+                                    blockCollision.target())
+                    ) {
                         request.onRayCastFinish(RayCastRequest.FinishReason.BLOCK_IN);
                         return true;
                     }
                 } else {
-                    if (request.onBlockOut(blockCollision.in(), blockCollision.out(), blockCollision.target())) {
+                    if (
+                            request.onBlockOut(
+                                    blockCollision.in(), blockCollision.inNormal(),
+                                    blockCollision.out(), blockCollision.outNormal(),
+                                    blockCollision.target())
+                    ) {
                         request.onRayCastFinish(RayCastRequest.FinishReason.BLOCK_OUT);
                         return true;
                     }

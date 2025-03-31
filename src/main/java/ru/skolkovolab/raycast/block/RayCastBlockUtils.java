@@ -5,7 +5,6 @@ import net.minestom.server.collision.ShapeImpl;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import ru.skolkovolab.raycast.shared.Pair;
 import ru.skolkovolab.raycast.shared.VecRel;
 import ru.skolkovolab.raycast.shared.collision.BlockCollision;
 
@@ -20,24 +19,40 @@ import java.util.stream.Stream;
  */
 public class RayCastBlockUtils {
 
-    public static Pair<VecRel, VecRel> getIntersection(Point boxStart, Point boxEnd, Point[] from, Point[] dir) {
+    private record Intersection(
+            VecRel in,
+            Vec inNormal,
+            VecRel out,
+            Vec outNormal
+    ) {}
+
+    private static Intersection getIntersection(Point boxStart, Point boxEnd, Point[] from, Point[] dir) {
         double[] boxRaw = new double[]{boxStart.x(), boxStart.y(), boxStart.z(), boxEnd.x(), boxEnd.y(), boxEnd.z()};
         VecRel prev = null;
+        Vec prevNormal = null;
         for (int i = 0; i < 6; i++) {
-            VecRel point = getPlaneIntersection(boxRaw[i], from[i % 3], dir[i % 3]).rotateNegative(i % 3);
+            int axis = i % 3;
+            boolean isPositive = i >= 3;
+            VecRel point = getPlaneIntersection(boxRaw[i], from[axis], dir[axis]).rotateNegative(axis);
             if (isInside(boxStart, boxEnd, point.vec())) {
+                double nx = 0, ny = 0, nz = 0;
+                if (axis == 0) nx = isPositive ? 1 : -1;
+                if (axis == 1) ny = isPositive ? 1 : -1;
+                if (axis == 2) nz = isPositive ? 1 : -1;
+                Vec normal = new Vec(nx, ny, nz);
                 if (prev == null) {
                     prev = point;
+                    prevNormal = normal;
                 } else {
                     if (prev.dist() > point.dist()) {
-                        return new Pair<>(point, prev);
+                        return new Intersection(point, normal, prev, prevNormal);
                     } else {
-                        return new Pair<>(prev, point);
+                        return new Intersection(prev, prevNormal, point, normal);
                     }
                 }
             }
         }
-        return prev == null ? null : new Pair<>(prev, prev);
+        return prev == null ? null : new Intersection(prev, prevNormal, prev, prevNormal);
     }
 
     public static boolean isInside(Point boxStart, Point boxEnd, Point point) {
@@ -100,7 +115,7 @@ public class RayCastBlockUtils {
     ) {
         Vec mid = midBlockPos(vec1.vec(), vec2.vec());
         Block block = getter.getBlock(mid);
-        return new Collision(vec1, vec2, mid, block, false, true);
+        return new Collision(vec1, null, vec2, null, mid, block, false, true);
     }
 
     public static List<BlockCollision> buildBlockCollisions(
@@ -124,20 +139,19 @@ public class RayCastBlockUtils {
                 rotate(vec1.vec(), 2)
         };
 
-        @SuppressWarnings("UnstableApiUsage")
         List<BoundingBox> boundingBoxes = ((ShapeImpl) block.registry().collisionShape()).collisionBoundingBoxes();
 
         return boundingBoxes.stream()
                 .map(shape -> getIntersection(shape.relativeStart().add(loc), shape.relativeEnd().add(loc), from, dir))
                 .filter(Objects::nonNull)
-                .peek(pair -> {
-                    pair.a.b += vec1.b;
-                    pair.b.b += vec1.b;
+                .peek(intersection -> {
+                    intersection.in.b += vec1.b;
+                    intersection.out.b += vec1.b;
                 })
-                .filter(pair -> !half || (pair.a.b >= 0 && /* assertion */ pair.b.b >= 0))
-                .flatMap(pair -> Stream.of(
-                        (BlockCollision) new Collision(pair.a, pair.b, mid, block, true, false),
-                        new Collision(pair.a, pair.b, mid, block, false, false)
+                .filter(intersection -> !half || (intersection.in.b >= 0 && /* assertion */ intersection.out.b >= 0))
+                .flatMap(intersection -> Stream.of(
+                        (BlockCollision) new Collision(intersection.in, intersection.inNormal, intersection.out, intersection.outNormal, mid, block, true, false),
+                        new Collision(intersection.in, intersection.inNormal, intersection.out, intersection.outNormal, mid, block, false, false)
                 ))
                 .sorted(Comparator.comparingDouble(c -> (c.distance() * 2) + (c.isOutlet() ? 1 : 0)))
                 .toList();
