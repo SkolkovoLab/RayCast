@@ -5,5 +5,7 @@ import net.minestom.server.instance.block.Block;
 
 public non-sealed interface BlockCollision extends RayCastCollision<Block> {
     Vec blockPos();
+    Vec inNormal();
+    Vec outNormal();
     boolean isStep();
 }
