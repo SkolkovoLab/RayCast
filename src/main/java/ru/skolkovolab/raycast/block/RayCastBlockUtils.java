@@ -139,7 +139,7 @@ public class RayCastBlockUtils {
                 rotate(vec1.vec(), 2)
         };
 
-        List<BoundingBox> boundingBoxes = ((ShapeImpl) block.registry().collisionShape()).collisionBoundingBoxes();
+        List<BoundingBox> boundingBoxes = ((ShapeImpl) block.registry().collisionShape()).boundingBoxes();
 
         return boundingBoxes.stream()
                 .map(shape -> getIntersection(shape.relativeStart().add(loc), shape.relativeEnd().add(loc), from, dir))
